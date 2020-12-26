@@ -1,5 +1,6 @@
 #include "../lib/Map.hpp"
 #include <iostream>
+#include <queue>
 
 std::ifstream &operator>>(std::ifstream &in, Map &map)
 {
@@ -30,6 +31,33 @@ std::ifstream &operator>>(std::ifstream &in, Map &map)
         }
     }
     return in;
+}
+
+bool Map::hasPath(std::string startJunctionName, std::string endJunctionName)
+{
+    auto startJunction = getJunctionByName(startJunctionName);
+    auto endJunction = getJunctionByName(endJunctionName);
+    std::vector<Junction *> passed;
+    std::queue<Junction *> bfsQueue;
+    bfsQueue.push(startJunction);
+    passed.push_back(startJunction);
+    while (!bfsQueue.empty())
+    {
+        auto currentJunction = bfsQueue.front();
+        bfsQueue.pop();
+        for (auto street : currentJunction->getStreets())
+        {
+            if (street.end == endJunction)
+                return true;
+            if (std::find_if(passed.begin(),
+                             passed.end(),
+                             [street](auto passedJunction) { return passedJunction->getName().compare(street.end->getName()) == 0; }) == passed.end())
+            {
+                bfsQueue.push(street.end);
+            }
+        }
+    }
+    return false;
 }
 
 Junction *Map::getJunctionByName(const std::string &junctiontName)

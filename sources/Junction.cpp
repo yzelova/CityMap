@@ -5,6 +5,11 @@ Junction::Junction(const std::string &name)
     this->name = name;
 }
 
+std::vector<Street> Junction::getStreets() const
+{
+    return streets;
+}
+
 std::string Junction::getName() const
 {
     return name;
