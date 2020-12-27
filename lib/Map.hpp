@@ -10,6 +10,7 @@ public:
     friend std::ifstream &operator>>(std::ifstream &, Map &);
 
     bool hasPath(std::string, std::string);
+    std::vector<std::pair<std::string, std::string>> getDeadends();
 
     std::vector<Junction *> getJunctions() const;
 

@@ -12,6 +12,10 @@ int main()
     {
         std::cout << junct->getName() << std::endl;
     }
-    std::cout << map.hasPath("Popa", "NDK") << std::endl;
+    auto deadEnds = map.getDeadends();
+    for (auto deadend : deadEnds)
+    {
+        std::cout << deadend.first << " " << deadend.second << std::endl;
+    }
     return 0;
 }

@@ -59,6 +59,22 @@ bool Map::hasPath(std::string startJunctionName, std::string endJunctionName)
     }
     return false;
 }
+std::vector<std::pair<std::string, std::string>> Map::getDeadends()
+{
+    std::vector<std::pair<std::string, std::string>> deadends;
+    for (auto junction : junctions)
+    {
+        for (auto street : junction->getStreets())
+        {
+            auto nextJunction = street.end;
+            if (nextJunction->getStreets().size() == 0)
+            {
+                deadends.push_back({junction->getName(), nextJunction->getName()});
+            }
+        }
+    }
+    return deadends;
+}
 
 Junction *Map::getJunctionByName(const std::string &junctiontName)
 {
