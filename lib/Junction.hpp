@@ -18,6 +18,7 @@ private:
 
 struct Street
 {
+    Junction* begin;
     Junction *end;
     double distance;
 };

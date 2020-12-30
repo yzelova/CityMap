@@ -11,6 +11,7 @@ public:
 
     bool hasPath(std::string, std::string);
     bool canReachEveryOtherJunction(std::string);
+    bool hasCyclicWalkFromJunction(std::string);
     std::vector<std::pair<std::string, std::string>> getDeadends();
 
     std::vector<Junction *> getJunctions() const;
