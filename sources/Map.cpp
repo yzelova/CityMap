@@ -33,6 +33,13 @@ std::ifstream &operator>>(std::ifstream &in, Map &map)
     return in;
 }
 
+bool vectorContainsJunction(const std::vector<Junction *> &v, Junction *junction)
+{
+    return std::find_if(v.begin(),
+                        v.end(),
+                        [junction](auto passedJunction) { return passedJunction->getName().compare(junction->getName()) == 0; }) != v.end();
+}
+
 bool Map::hasPath(std::string startJunctionName, std::string endJunctionName)
 {
     auto startJunction = getJunctionByName(startJunctionName);
@@ -49,9 +56,7 @@ bool Map::hasPath(std::string startJunctionName, std::string endJunctionName)
         {
             if (street.end == endJunction)
                 return true;
-            if (std::find_if(passed.begin(),
-                             passed.end(),
-                             [street](auto passedJunction) { return passedJunction->getName().compare(street.end->getName()) == 0; }) == passed.end())
+            if (vectorContainsJunction(passed, street.end))
             {
                 bfsQueue.push(street.end);
             }
@@ -59,6 +64,37 @@ bool Map::hasPath(std::string startJunctionName, std::string endJunctionName)
     }
     return false;
 }
+
+bool Map::canReachEveryOtherJunction(std::string junctionName)
+{
+    auto currentJunction = getJunctionByName(junctionName);
+    std::vector<Junction*> reachedJunctions{currentJunction};
+    int reachedJunctionsCount = reachableJunctionsCount(currentJunction, reachedJunctions);
+    std::cout<<reachedJunctionsCount<<std::endl;
+    return reachedJunctionsCount == junctions.size();
+}
+
+int Map::reachableJunctionsCount(Junction* currentJunction, std::vector<Junction*>& reachedJunctions)
+{
+    if(currentJunction->getStreets().size() == 0)
+    {
+        return 1;
+    }
+    int count{0};
+    for(auto street : currentJunction->getStreets())
+    {
+        std::cout<<street.end->getName()<<std::endl;
+        if(vectorContainsJunction(reachedJunctions, street.end))
+        {
+            continue;
+        }
+        reachedJunctions.push_back(street.end);
+        count += reachableJunctionsCount(street.end, reachedJunctions);
+        reachedJunctions.pop_back();
+    }
+    return count + 1;
+}
+
 std::vector<std::pair<std::string, std::string>> Map::getDeadends()
 {
     std::vector<std::pair<std::string, std::string>> deadends;

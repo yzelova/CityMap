@@ -17,5 +17,6 @@ int main()
     {
         std::cout << deadend.first << " " << deadend.second << std::endl;
     }
+    std::cout<<map.canReachEveryOtherJunction("5Kiosheta")<<std::endl;
     return 0;
 }
