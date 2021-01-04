@@ -3,6 +3,7 @@
 #include <queue>
 #include <stack>
 #include <algorithm>
+#include <map>
 
 std::ifstream &operator>>(std::ifstream &in, Map &map)
 {
@@ -250,6 +251,129 @@ int Map::getStreetsCount()
     return streetsCount;
 }
 
+std::vector<std::pair<std::vector<std::string>, int>> Map::getKShortestPaths(int k, std::string begin, std::string end)
+{
+    std::vector<std::pair<std::vector<std::string>, int>> result{};
+    auto first = getKShortestPaths(0, k, getJunctionByName(begin), getJunctionByName(end));
+    if (!first)
+    {
+        return result;
+    }
+    result.push_back(first.value());
+    int minDistance = INT_MAX;
+    std::optional<std::pair<std::vector<std::string>, int>> second{};
+    Map alteredMap;
+    for (auto junction : junctions)
+    {
+        for (auto street : junction->getStreets())
+        {
+            junction->removeStreet(street);
+            auto minDistanceWithoutEdge = getKShortestPaths(0, k, getJunctionByName(begin), getJunctionByName(end));
+            if (minDistanceWithoutEdge &&
+                minDistanceWithoutEdge.value().second < minDistance &&
+                minDistanceWithoutEdge.value().first != first.value().first)
+            {
+                second = minDistanceWithoutEdge;
+                minDistance = minDistanceWithoutEdge.value().second;
+                alteredMap = *this; //VERY REFACTOR!!!
+            }
+            junction->addStreet(street);
+        }
+    }
+    if (!second)
+    {
+        return result;
+    }
+    result.push_back(second.value());
+    minDistance = INT_MAX;
+    std::optional<std::pair<std::vector<std::string>, int>> third{};
+    for (auto junction : alteredMap.junctions)
+    {
+        for (auto street : junction->getStreets())
+        {
+            junction->removeStreet(street);
+            auto minDistanceWithoutEdge = alteredMap.getKShortestPaths(0, k,
+                                                                       alteredMap.getJunctionByName(begin),
+                                                                       alteredMap.getJunctionByName(end));
+
+            if (minDistanceWithoutEdge &&
+                minDistanceWithoutEdge.value().second < minDistance &&
+                minDistanceWithoutEdge.value().first != second.value().first)
+            {
+                third = minDistanceWithoutEdge;
+                minDistance = minDistanceWithoutEdge.value().second;
+            }
+            junction->addStreet(street);
+        }
+    }
+    if (!third)
+    {
+        return result;
+    }
+    result.push_back(third.value());
+
+    return result;
+}
+
+std::optional<std::pair<std::vector<std::string>, int>> Map::getKShortestPaths(int current, int k, Junction *begin, Junction *end)
+{
+    int junctionsCount = junctions.size();
+    std::map<Junction *, int> distances;
+    std::map<Junction *, Junction *> parents;
+    for (auto junction : junctions)
+    {
+        distances[junction] = INT_MAX;
+        parents[junction] = nullptr;
+    }
+    distances[begin] = 0;
+    parents[begin] = nullptr;
+    std::vector<Junction *> passedJunctions;
+    while (passedJunctions.size() != junctionsCount)
+    {
+        int minDistance = INT_MAX;
+        Junction *nextJunction{nullptr};
+
+        for (auto junction : junctions)
+        {
+            if (!vectorContainsJunction(passedJunctions, junction))
+            {
+                if (distances[junction] < minDistance)
+                {
+                    minDistance = distances[junction];
+                    nextJunction = junction;
+                }
+            }
+        }
+        if (nextJunction == nullptr)
+        {
+            return {};
+        }
+        passedJunctions.push_back(nextJunction);
+        for (auto street : nextJunction->getStreets())
+        {
+            auto adj = street.end;
+            if (street.distance + distances[nextJunction] < distances[adj])
+            {
+                distances[adj] = street.distance + distances[nextJunction];
+                parents[adj] = nextJunction;
+            }
+        }
+    }
+    if (end != begin && parents[end] == nullptr)
+    {
+        return {};
+    }
+    std::vector<std::string> currentPath;
+    for (auto current = end; current != nullptr;)
+    {
+        currentPath.push_back(current->getName());
+        current = parents[current];
+    }
+    std::reverse(currentPath.begin(), currentPath.end());
+
+    return {{currentPath, distances[end]}};
+}
+
 bool Map::hasEulerianCycle()
 {
     for (auto junction : junctions)
@@ -260,4 +384,34 @@ bool Map::hasEulerianCycle()
         }
     }
     return true;
+}
+
+Map &Map::operator=(const Map &other)
+{
+    if (this != &other)
+    {
+        copy(other);
+    }
+    return *this;
+}
+
+void Map::copy(const Map &other)
+{
+    for (auto junction : other.junctions)
+    {
+        auto newJunction = new Junction(junction->getName());
+        junctions.push_back(newJunction);
+    }
+
+    for (auto junction : other.junctions)
+    {
+        for (auto street : junction->getStreets())
+        {
+            Street newStreet;
+            newStreet.begin = getJunctionByName(street.begin->getName());
+            newStreet.end = getJunctionByName(street.end->getName());
+            newStreet.distance = street.distance;
+            getJunctionByName(street.begin->getName())->addStreet(newStreet);
+        }
+    }
 }

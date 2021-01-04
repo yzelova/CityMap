@@ -31,3 +31,13 @@ int Junction::getOutdegree() const
 {
     return outdegree;
 }
+
+void Junction::removeStreet(Street street)
+{
+    streets.erase(std::remove_if(streets.begin(), streets.end(), [street](auto vecStreet) {
+        return (
+            street.end->getName() == vecStreet.end->getName() &&
+            street.distance == vecStreet.distance);
+    }));
+    return;
+}

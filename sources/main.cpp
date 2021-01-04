@@ -32,6 +32,15 @@ int main()
     {
         std::cout<<"No path"<<std::endl;
     }
-    
+    auto paths = map.getKShortestPaths(2, "NDK", "Popa");
+    for(auto path : paths)
+    {
+        for(auto junction : path.first)
+        {
+            std::cout<<junction<<" ";
+        }
+        std::cout<<path.second<<" ";
+        std::cout<<std::endl;
+    }   
     return 0;
 }
