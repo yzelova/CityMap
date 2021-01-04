@@ -17,7 +17,21 @@ int main()
     {
         std::cout << deadend.first << " " << deadend.second << std::endl;
     }
-    std::cout<<map.canReachEveryOtherJunction("5Kiosheta")<<std::endl;
-    std::cout<<map.hasCyclicWalkFromJunction("Popa")<<std::endl;
+    std::cout << map.canReachEveryOtherJunction("5Kiosheta") << std::endl;
+    std::cout << map.hasCyclicWalkFromJunction("Popa") << std::endl;
+    //std::cout<<map.hasEulerianCycle()<<std::endl;
+    auto walk = map.getEulerWalk();
+    if (walk.has_value())
+    {
+        for (auto name : walk.value())
+        {
+            std::cout << name << " " << std::endl;
+        }
+    }
+    else
+    {
+        std::cout<<"No path"<<std::endl;
+    }
+    
     return 0;
 }

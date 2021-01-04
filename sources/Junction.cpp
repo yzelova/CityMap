@@ -17,5 +17,17 @@ std::string Junction::getName() const
 
 void Junction::addStreet(Street street)
 {
+    street.begin->outdegree++;
+    street.end->indegree++;
     streets.push_back(street);
+}
+
+int Junction::getIndegree() const
+{
+    return indegree;
+}
+
+int Junction::getOutdegree() const
+{
+    return outdegree;
 }

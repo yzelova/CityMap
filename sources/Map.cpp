@@ -1,6 +1,8 @@
 #include "../lib/Map.hpp"
 #include <iostream>
 #include <queue>
+#include <stack>
+#include <algorithm>
 
 std::ifstream &operator>>(std::ifstream &in, Map &map)
 {
@@ -192,4 +194,70 @@ double Map::readDistance(std::string &line)
 std::vector<Junction *> Map::getJunctions() const
 {
     return junctions;
+}
+std::optional<std::vector<std::string>> Map::getEulerWalk()
+{
+    bool hasCycle = hasEulerianCycle();
+    if (!hasCycle)
+    {
+        return {};
+    }
+    if (junctions.size() == 0)
+    {
+        return {std::vector<std::string>{}};
+    }
+    Junction *begin = junctions[0];
+    std::stack<Junction *> traversalStack;
+    traversalStack.push(begin);
+    int streetsCount = getStreetsCount();
+    std::vector<Street> usedStreets;
+    while (usedStreets.size() != streetsCount)
+    {
+        auto currentJunction = traversalStack.top();
+        bool flag = false;
+        for (auto street : currentJunction->getStreets())
+        {
+            if (!vectorContainsStreet(usedStreets, street))
+            {
+                usedStreets.push_back(street);
+                traversalStack.push(street.end);
+                flag = true;
+                break;
+            }
+        }
+        if (!flag)
+        {
+            traversalStack.pop();
+        }
+    }
+    std::vector<std::string> walk{};
+    for (int cnt = 0; !traversalStack.empty(); cnt++)
+    {
+        walk.push_back(traversalStack.top()->getName());
+        traversalStack.pop();
+    }
+    std::reverse(walk.begin(), walk.end());
+    return walk;
+}
+
+int Map::getStreetsCount()
+{
+    int streetsCount{0};
+    for (auto junction : junctions)
+    {
+        streetsCount += junction->getStreets().size();
+    }
+    return streetsCount;
+}
+
+bool Map::hasEulerianCycle()
+{
+    for (auto junction : junctions)
+    {
+        if (junction->getIndegree() != junction->getOutdegree())
+        {
+            return false;
+        }
+    }
+    return true;
 }
