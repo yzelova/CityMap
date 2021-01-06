@@ -4,11 +4,17 @@
 #include <optional>
 #include "Junction.hpp"
 
+class InteractiveMode;
+
 class Map
 {
 public:
     friend std::ifstream &operator>>(std::ifstream &, Map &);
-    Map& operator=(const Map&);
+    Map() = default;
+    Map &operator=(const Map &);
+    Map(const Map &);
+
+    Map closeJunctions(std::vector<std::string>);
 
     bool hasPath(std::string, std::string);
     bool canReachEveryOtherJunction(std::string);
@@ -21,12 +27,13 @@ public:
     std::vector<Junction *> getJunctions() const;
 
 private:
-    void copy(const Map&);
-    std::optional<std::pair<std::vector<std::string>, int>> getKShortestPaths(int, int, Junction*, Junction*);
+    void copy(const Map &);
+    std::optional<std::pair<std::vector<std::string>, int>> getKShortestPaths(int, int, Junction *, Junction *);
     bool hasEulerianCycle();
     std::string readJunctionName(std::string &);
     double readDistance(std::string &);
-    Junction *getJunctionByName(const std::string &);
     int reachableJunctionsCount(Junction *, std::vector<Junction *> &);
     std::vector<Junction *> junctions;
+    Junction *getJunctionByName(const std::string &);
+    friend class InteractiveMode;
 };

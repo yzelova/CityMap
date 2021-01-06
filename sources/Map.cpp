@@ -251,10 +251,9 @@ int Map::getStreetsCount()
     return streetsCount;
 }
 
-std::vector<std::pair<std::vector<std::string>, int>> Map::getKShortestPaths(int k, std::string begin, std::string end, std::vector<std::string> closedJunctions)
+Map Map::closeJunctions(std::vector<std::string> closedJunctions)
 {
-    Map cpy;
-    cpy = *this;
+    Map cpy{*this};
     for (auto name : closedJunctions)
     {
         auto junction = getJunctionByName(name);
@@ -272,6 +271,12 @@ std::vector<std::pair<std::vector<std::string>, int>> Map::getKShortestPaths(int
             }
         }
     }
+    return cpy;
+}
+
+std::vector<std::pair<std::vector<std::string>, int>> Map::getKShortestPaths(int k, std::string begin, std::string end, std::vector<std::string> closedJunctions)
+{
+    auto cpy = closeJunctions(closedJunctions);
     return cpy.getKShortestPaths(k, begin, end);
 }
 
@@ -438,4 +443,9 @@ void Map::copy(const Map &other)
             getJunctionByName(street.begin->getName())->addStreet(newStreet);
         }
     }
+}
+
+Map::Map(const Map &other)
+{
+    copy(other);
 }
