@@ -3,19 +3,19 @@
 #include <vector>
 #include <algorithm>
 
-class Street;
+struct Street;
 
 class Junction
 {
 public:
     Junction(const std::string &);
-    Junction(const Junction&) = delete;
     void addStreet(Street street);
     std::vector<Street> getStreets() const;
     std::string getName() const;
     int getIndegree() const;
     int getOutdegree() const;
     void removeStreet(Street street);
+
 private:
     int indegree{0};
     int outdegree{0};
@@ -25,7 +25,7 @@ private:
 
 struct Street
 {
-    Junction* begin;
+    Junction *begin;
     Junction *end;
     double distance;
 };

@@ -8,6 +8,9 @@ class InteractiveMode
 {
 public:
     InteractiveMode(std::string, std::string);
+    InteractiveMode(const InteractiveMode&);
+    InteractiveMode& operator=(const InteractiveMode&);
+    ~InteractiveMode() = default;
     bool readAndProcessCommand();
 
 private:

@@ -34,7 +34,7 @@ int Junction::getOutdegree() const
 
 void Junction::removeStreet(Street street)
 {
-    streets.erase(std::remove_if(streets.begin(), streets.end(), [street](auto vecStreet) {
+    streets.erase(std::find_if(streets.begin(), streets.end(), [&street](auto vecStreet) {
         return (
                    street.begin->getName().compare(vecStreet.begin->getName()) == 0 &&
                    street.end->getName().compare(vecStreet.end->getName())) == 0;

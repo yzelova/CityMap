@@ -1,9 +1,53 @@
 #include "../lib/Map.hpp"
+#include "../lib/utils.hpp"
 #include <iostream>
 #include <queue>
 #include <stack>
 #include <algorithm>
 #include <map>
+
+Map &Map::operator=(const Map &other)
+{
+    if (this != &other)
+    {
+        copy(other);
+    }
+    return *this;
+}
+
+void Map::copy(const Map &other)
+{
+    for (auto junction : other.junctions)
+    {
+        auto newJunction = new Junction(junction->getName());
+        junctions.push_back(newJunction);
+    }
+
+    for (auto junction : other.junctions)
+    {
+        for (auto street : junction->getStreets())
+        {
+            Street newStreet;
+            newStreet.begin = getJunctionByName(street.begin->getName());
+            newStreet.end = getJunctionByName(street.end->getName());
+            newStreet.distance = street.distance;
+            getJunctionByName(street.begin->getName())->addStreet(newStreet);
+        }
+    }
+}
+
+Map::Map(const Map &other)
+{
+    copy(other);
+}
+
+Map::~Map()
+{
+    for (auto junction : junctions)
+    {
+        delete junction;
+    }
+}
 
 std::ifstream &operator>>(std::ifstream &in, Map &map)
 {
@@ -37,18 +81,34 @@ std::ifstream &operator>>(std::ifstream &in, Map &map)
     return in;
 }
 
-bool vectorContainsStreet(const std::vector<Street> &v, Street street)
+std::string Map::readJunctionName(std::string &line)
 {
-    return std::find_if(v.begin(),
-                        v.end(),
-                        [street](auto passedStreet) { return (passedStreet.begin->getName().compare(street.begin->getName()) == 0 && passedStreet.end->getName().compare(street.end->getName()) == 0); }) != v.end();
+    while (!line.empty() && line[0] == ' ')
+    {
+        line.erase(0, 1);
+    }
+    std::string name;
+    while (!line.empty() && line[0] != ' ')
+    {
+        name += line[0];
+        line.erase(0, 1);
+    }
+    return name;
 }
 
-bool vectorContainsJunction(const std::vector<Junction *> &v, Junction *junction)
+double Map::readDistance(std::string &line)
 {
-    return std::find_if(v.begin(),
-                        v.end(),
-                        [junction](auto passedJunction) { return passedJunction->getName().compare(junction->getName()) == 0; }) != v.end();
+    while (!line.empty() && line[0] == ' ')
+    {
+        line.erase(0, 1);
+    }
+    std::string strDistance;
+    while (!line.empty() && line[0] != ' ')
+    {
+        strDistance += line[0];
+        line.erase(0, 1);
+    }
+    return std::stod(strDistance);
 }
 
 bool Map::hasPath(std::string startJunctionName, std::string endJunctionName)
@@ -162,36 +222,6 @@ Junction *Map::getJunctionByName(const std::string &junctiontName)
     return *junction;
 }
 
-std::string Map::readJunctionName(std::string &line)
-{
-    while (!line.empty() && line[0] == ' ')
-    {
-        line.erase(0, 1);
-    }
-    std::string name;
-    while (!line.empty() && line[0] != ' ')
-    {
-        name += line[0];
-        line.erase(0, 1);
-    }
-    return name;
-}
-
-double Map::readDistance(std::string &line)
-{
-    while (!line.empty() && line[0] == ' ')
-    {
-        line.erase(0, 1);
-    }
-    std::string strDistance;
-    while (!line.empty() && line[0] != ' ')
-    {
-        strDistance += line[0];
-        line.erase(0, 1);
-    }
-    return std::stod(strDistance);
-}
-
 std::vector<Junction *> Map::getJunctions() const
 {
     return junctions;
@@ -257,7 +287,7 @@ Map Map::closeJunctions(std::vector<std::string> closedJunctions)
     for (auto name : closedJunctions)
     {
         auto junction = getJunctionByName(name);
-        cpy.junctions.erase(std::remove_if(cpy.junctions.begin(), cpy.junctions.end(), [&junction](auto vecJunction) {
+        cpy.junctions.erase(std::find_if(cpy.junctions.begin(), cpy.junctions.end(), [&junction](auto vecJunction) {
             return junction->getName() == vecJunction->getName();
         }));
         for (auto junc : cpy.junctions)
@@ -274,16 +304,16 @@ Map Map::closeJunctions(std::vector<std::string> closedJunctions)
     return cpy;
 }
 
-std::vector<std::pair<std::vector<std::string>, int>> Map::getKShortestPaths(int k, std::string begin, std::string end, std::vector<std::string> closedJunctions)
+std::vector<std::pair<std::vector<std::string>, int>> Map::get3ShortestPaths(std::string begin, std::string end, std::vector<std::string> closedJunctions)
 {
     auto cpy = closeJunctions(closedJunctions);
-    return cpy.getKShortestPaths(k, begin, end);
+    return cpy.get3ShortestPaths(begin, end);
 }
 
-std::vector<std::pair<std::vector<std::string>, int>> Map::getKShortestPaths(int k, std::string begin, std::string end)
+std::vector<std::pair<std::vector<std::string>, int>> Map::get3ShortestPaths(std::string begin, std::string end)
 {
     std::vector<std::pair<std::vector<std::string>, int>> result{};
-    auto first = getKShortestPaths(0, k, getJunctionByName(begin), getJunctionByName(end));
+    auto first = getShortestPath(getJunctionByName(begin), getJunctionByName(end));
     if (!first)
     {
         return result;
@@ -297,14 +327,14 @@ std::vector<std::pair<std::vector<std::string>, int>> Map::getKShortestPaths(int
         for (auto street : junction->getStreets())
         {
             junction->removeStreet(street);
-            auto minDistanceWithoutEdge = getKShortestPaths(0, k, getJunctionByName(begin), getJunctionByName(end));
+            auto minDistanceWithoutEdge = getShortestPath(getJunctionByName(begin), getJunctionByName(end));
             if (minDistanceWithoutEdge &&
                 minDistanceWithoutEdge.value().second < minDistance &&
                 minDistanceWithoutEdge.value().first != first.value().first)
             {
                 second = minDistanceWithoutEdge;
                 minDistance = minDistanceWithoutEdge.value().second;
-                alteredMap = *this; //VERY REFACTOR!!!
+                alteredMap = *this;
             }
             junction->addStreet(street);
         }
@@ -321,9 +351,8 @@ std::vector<std::pair<std::vector<std::string>, int>> Map::getKShortestPaths(int
         for (auto street : junction->getStreets())
         {
             junction->removeStreet(street);
-            auto minDistanceWithoutEdge = alteredMap.getKShortestPaths(0, k,
-                                                                       alteredMap.getJunctionByName(begin),
-                                                                       alteredMap.getJunctionByName(end));
+            auto minDistanceWithoutEdge = alteredMap.getShortestPath(alteredMap.getJunctionByName(begin),
+                                                                     alteredMap.getJunctionByName(end));
 
             if (minDistanceWithoutEdge &&
                 minDistanceWithoutEdge.value().second < minDistance &&
@@ -344,7 +373,7 @@ std::vector<std::pair<std::vector<std::string>, int>> Map::getKShortestPaths(int
     return result;
 }
 
-std::optional<std::pair<std::vector<std::string>, int>> Map::getKShortestPaths(int current, int k, Junction *begin, Junction *end)
+std::optional<std::pair<std::vector<std::string>, int>> Map::getShortestPath(Junction *begin, Junction *end)
 {
     int junctionsCount = junctions.size();
     std::map<Junction *, int> distances;
@@ -413,39 +442,4 @@ bool Map::hasEulerianCycle()
         }
     }
     return true;
-}
-
-Map &Map::operator=(const Map &other)
-{
-    if (this != &other)
-    {
-        copy(other);
-    }
-    return *this;
-}
-
-void Map::copy(const Map &other)
-{
-    for (auto junction : other.junctions)
-    {
-        auto newJunction = new Junction(junction->getName());
-        junctions.push_back(newJunction);
-    }
-
-    for (auto junction : other.junctions)
-    {
-        for (auto street : junction->getStreets())
-        {
-            Street newStreet;
-            newStreet.begin = getJunctionByName(street.begin->getName());
-            newStreet.end = getJunctionByName(street.end->getName());
-            newStreet.distance = street.distance;
-            getJunctionByName(street.begin->getName())->addStreet(newStreet);
-        }
-    }
-}
-
-Map::Map(const Map &other)
-{
-    copy(other);
 }

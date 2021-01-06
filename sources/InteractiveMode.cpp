@@ -122,3 +122,21 @@ Map InteractiveMode::getMap()
 {
     return originalMap.closeJunctions(closedJunctions);
 }
+
+InteractiveMode::InteractiveMode(const InteractiveMode &other)
+{
+    originalMap = other.originalMap;
+    currentJunction = originalMap.getJunctionByName(other.currentJunction->getName());
+    closedJunctions = other.closedJunctions;
+}
+
+InteractiveMode &InteractiveMode::operator=(const InteractiveMode &other)
+{
+    if (this != &other)
+    {
+        originalMap = other.originalMap;
+        currentJunction = originalMap.getJunctionByName(other.currentJunction->getName());
+        closedJunctions = other.closedJunctions;
+    }
+    return *this;
+}
