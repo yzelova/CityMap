@@ -15,9 +15,9 @@ public:
     bool hasCyclicWalkFromJunction(std::string);
     int getStreetsCount();
     std::vector<std::pair<std::vector<std::string>, int>> getKShortestPaths(int, std::string, std::string);
+    std::vector<std::pair<std::vector<std::string>, int>> getKShortestPaths(int, std::string, std::string, std::vector<std::string>);
     std::optional<std::vector<std::string>> getEulerWalk();
     std::vector<std::pair<std::string, std::string>> getDeadends();
-
     std::vector<Junction *> getJunctions() const;
 
 private:

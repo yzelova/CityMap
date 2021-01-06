@@ -251,6 +251,30 @@ int Map::getStreetsCount()
     return streetsCount;
 }
 
+std::vector<std::pair<std::vector<std::string>, int>> Map::getKShortestPaths(int k, std::string begin, std::string end, std::vector<std::string> closedJunctions)
+{
+    Map cpy;
+    cpy = *this;
+    for (auto name : closedJunctions)
+    {
+        auto junction = getJunctionByName(name);
+        cpy.junctions.erase(std::remove_if(cpy.junctions.begin(), cpy.junctions.end(), [&junction](auto vecJunction) {
+            return junction->getName() == vecJunction->getName();
+        }));
+        for (auto junc : cpy.junctions)
+        {
+            Street street;
+            street.begin = junc;
+            street.end = junction;
+            if (vectorContainsStreet(junc->getStreets(), street))
+            {
+                junc->removeStreet(street);
+            }
+        }
+    }
+    return cpy.getKShortestPaths(k, begin, end);
+}
+
 std::vector<std::pair<std::vector<std::string>, int>> Map::getKShortestPaths(int k, std::string begin, std::string end)
 {
     std::vector<std::pair<std::vector<std::string>, int>> result{};

@@ -30,17 +30,28 @@ int main()
     }
     else
     {
-        std::cout<<"No path"<<std::endl;
+        std::cout << "No path" << std::endl;
     }
     auto paths = map.getKShortestPaths(2, "NDK", "Popa");
-    for(auto path : paths)
+    for (auto path : paths)
     {
-        for(auto junction : path.first)
+        for (auto junction : path.first)
         {
-            std::cout<<junction<<" ";
+            std::cout << junction << " ";
         }
-        std::cout<<path.second<<" ";
-        std::cout<<std::endl;
-    }   
+        std::cout << path.second << " ";
+        std::cout << std::endl;
+    }
+    std::cout<<"---------------------------------------->\n";
+    auto pathsWithCLosedJunctions = map.getKShortestPaths(2, "NDK", "Popa", std::vector<std::string>{"neshtosi"});
+    for (auto path : pathsWithCLosedJunctions)
+    {
+        for (auto junction : path.first)
+        {
+            std::cout << junction << " ";
+        }
+        std::cout << path.second << " ";
+        std::cout << std::endl;
+    }
     return 0;
 }
