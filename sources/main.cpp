@@ -16,7 +16,7 @@ int main(int argc, char *argv[])
 
         }
     }
-    std::ifstream fin{"../test.txt"};
+    std::ifstream fin{"test.txt"};
     Map map;
     fin >> map;
     for (auto junct : map.getJunctions())
@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
     {
         std::cout << "No path" << std::endl;
     }
-    auto paths = map.getKShortestPaths(2, "NDK", "BSFS");
+    auto paths = map.get3ShortestPaths("NDK", "Popa");
     for (auto path : paths)
     {
         for (auto junction : path.first)
@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
         std::cout << std::endl;
     }
     std::cout<<"---------------------------------------->\n";
-    auto pathsWithCLosedJunctions = map.getKShortestPaths(2, "NDK", "BSFS", std::vector<std::string>{"neshtosi"});
+    auto pathsWithCLosedJunctions = map.get3ShortestPaths("NDK", "Popa", std::vector<std::string>{"BSFS"});
     for (auto path : pathsWithCLosedJunctions)
     {
         for (auto junction : path.first)

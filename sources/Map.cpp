@@ -111,7 +111,7 @@ double Map::readDistance(std::string &line)
     return std::stod(strDistance);
 }
 
-bool Map::hasPath(std::string startJunctionName, std::string endJunctionName)
+bool Map::hasPath(const std::string &startJunctionName, const std::string &endJunctionName)
 {
     auto startJunction = getJunctionByName(startJunctionName);
     auto endJunction = getJunctionByName(endJunctionName);
@@ -136,7 +136,7 @@ bool Map::hasPath(std::string startJunctionName, std::string endJunctionName)
     return false;
 }
 
-bool Map::canReachEveryOtherJunction(std::string junctionName)
+bool Map::canReachEveryOtherJunction(const std::string &junctionName)
 {
     auto currentJunction = getJunctionByName(junctionName);
     std::vector<Junction *> reachedJunctions{currentJunction};
@@ -164,7 +164,7 @@ int Map::reachableJunctionsCount(Junction *currentJunction, std::vector<Junction
     return count + 1;
 }
 
-bool Map::hasCyclicWalkFromJunction(std::string junctionName)
+bool Map::hasCyclicWalkFromJunction(const std::string &junctionName)
 {
     auto junction = getJunctionByName(junctionName);
     if (junction->getStreets().size() == 0)
@@ -281,7 +281,7 @@ int Map::getStreetsCount()
     return streetsCount;
 }
 
-Map Map::closeJunctions(std::vector<std::string> closedJunctions)
+Map Map::closeJunctions(const std::vector<std::string> &closedJunctions)
 {
     Map cpy{*this};
     for (auto name : closedJunctions)
@@ -304,13 +304,13 @@ Map Map::closeJunctions(std::vector<std::string> closedJunctions)
     return cpy;
 }
 
-std::vector<std::pair<std::vector<std::string>, int>> Map::get3ShortestPaths(std::string begin, std::string end, std::vector<std::string> closedJunctions)
+std::vector<std::pair<std::vector<std::string>, int>> Map::get3ShortestPaths(const std::string &begin, const std::string &end, const std::vector<std::string> &closedJunctions)
 {
     auto cpy = closeJunctions(closedJunctions);
     return cpy.get3ShortestPaths(begin, end);
 }
 
-std::vector<std::pair<std::vector<std::string>, int>> Map::get3ShortestPaths(std::string begin, std::string end)
+std::vector<std::pair<std::vector<std::string>, int>> Map::get3ShortestPaths(const std::string &begin, const std::string &end)
 {
     std::vector<std::pair<std::vector<std::string>, int>> result{};
     auto first = getShortestPath(getJunctionByName(begin), getJunctionByName(end));

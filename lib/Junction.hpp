@@ -9,12 +9,12 @@ class Junction
 {
 public:
     Junction(const std::string &);
-    void addStreet(Street street);
+    void addStreet(const Street& street);
     std::vector<Street> getStreets() const;
     std::string getName() const;
     int getIndegree() const;
     int getOutdegree() const;
-    void removeStreet(Street street);
+    void removeStreet(const Street& street);
 
 private:
     int indegree{0};

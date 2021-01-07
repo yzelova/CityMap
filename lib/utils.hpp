@@ -2,7 +2,7 @@
 #include <algorithm>
 #include "Junction.hpp"
 
-bool vectorContainsStreet(const std::vector<Street> &v, Street street)
+bool vectorContainsStreet(const std::vector<Street> &v, const Street &street)
 {
     return std::find_if(v.begin(),
                         v.end(),

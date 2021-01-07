@@ -15,14 +15,14 @@ public:
     Map(const Map &);
     ~Map();
 
-    Map closeJunctions(std::vector<std::string>);
+    Map closeJunctions(const std::vector<std::string>&);
 
-    bool hasPath(std::string, std::string);
-    bool canReachEveryOtherJunction(std::string);
-    bool hasCyclicWalkFromJunction(std::string);
+    bool hasPath(const std::string&, const std::string&);
+    bool canReachEveryOtherJunction(const std::string&);
+    bool hasCyclicWalkFromJunction(const std::string&);
     int getStreetsCount();
-    std::vector<std::pair<std::vector<std::string>, int>> get3ShortestPaths(std::string, std::string);
-    std::vector<std::pair<std::vector<std::string>, int>> get3ShortestPaths(std::string, std::string, std::vector<std::string>);
+    std::vector<std::pair<std::vector<std::string>, int>> get3ShortestPaths(const std::string&,const  std::string&);
+    std::vector<std::pair<std::vector<std::string>, int>> get3ShortestPaths(const std::string&,const  std::string&,const  std::vector<std::string>&);
     std::optional<std::vector<std::string>> getEulerWalk();
     std::vector<std::pair<std::string, std::string>> getDeadends();
     std::vector<Junction *> getJunctions() const;
@@ -33,7 +33,7 @@ private:
     bool hasEulerianCycle();
     std::string readJunctionName(std::string &);
     double readDistance(std::string &);
-    int reachableJunctionsCount(Junction *, std::vector<Junction *> &);
+    int reachableJunctionsCount(Junction *,std::vector<Junction *> &);
     std::vector<Junction *> junctions;
     Junction *getJunctionByName(const std::string &);
     friend class InteractiveMode;

@@ -15,7 +15,7 @@ std::string Junction::getName() const
     return name;
 }
 
-void Junction::addStreet(Street street)
+void Junction::addStreet(const Street& street)
 {
     street.begin->outdegree++;
     street.end->indegree++;
@@ -32,7 +32,7 @@ int Junction::getOutdegree() const
     return outdegree;
 }
 
-void Junction::removeStreet(Street street)
+void Junction::removeStreet(const Street& street)
 {
     streets.erase(std::find_if(streets.begin(), streets.end(), [&street](auto vecStreet) {
         return (

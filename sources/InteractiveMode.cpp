@@ -2,14 +2,16 @@
 #include <iostream>
 #include <cassert>
 
-InteractiveMode::InteractiveMode(std::string filePath, std::string startJunctionName)
+//opens file, reads map from it and places the user at startJunctionName
+InteractiveMode::InteractiveMode(const std::string &filePath, const std::string &startJunctionName)
 {
-    std::ifstream fin{"test.txt"};
+    std::ifstream fin{filePath};
     assert(fin.good());
     fin >> originalMap;
     currentJunction = originalMap.getJunctionByName(startJunctionName);
 }
 
+//parses and executes commands from command line
 bool InteractiveMode::readAndProcessCommand()
 {
     auto currentMap = getMap();
@@ -44,7 +46,7 @@ bool InteractiveMode::readAndProcessCommand()
     {
         std::string moveToName;
         std::cin >> moveToName;
-        auto path = currentMap.getKShortestPaths(1, currentJunction->getName(), moveToName);
+        auto path = currentMap.get3ShortestPaths(currentJunction->getName(), moveToName);
         if (path.size() == 0)
         {
             std::cout << "No path from " << currentJunction->getName() << " to " << moveToName << " or it is closed!\n";
