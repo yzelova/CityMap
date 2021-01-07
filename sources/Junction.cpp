@@ -1,4 +1,5 @@
 #include "../lib/Junction.hpp"
+#include "../lib/Street.hpp"
 
 Junction::Junction(const std::string &name)
 {
@@ -15,7 +16,7 @@ std::string Junction::getName() const
     return name;
 }
 
-void Junction::addStreet(const Street& street)
+void Junction::addStreet(const Street &street)
 {
     street.begin->outdegree++;
     street.end->indegree++;
@@ -32,8 +33,10 @@ int Junction::getOutdegree() const
     return outdegree;
 }
 
-void Junction::removeStreet(const Street& street)
+void Junction::removeStreet(const Street &street)
 {
+    street.begin->outdegree--;
+    street.end->indegree--;
     streets.erase(std::find_if(streets.begin(), streets.end(), [&street](auto vecStreet) {
         return (
                    street.begin->getName().compare(vecStreet.begin->getName()) == 0 &&

@@ -4,7 +4,7 @@
 #include "Map.hpp"
 #include "Junction.hpp"
 
-//This class takes care of when the program is run in interactive mode
+//Грижи се за интерактивният режим
 class InteractiveMode
 {
 public:
@@ -16,7 +16,7 @@ public:
 
 private:
     Map getMap();
-    Map originalMap; //stores the original junctions and streets
-    Junction *currentJunction; //stores where the user is currently placed
-    std::vector<std::string> closedJunctions; //stores all currently closed junctions
+    Map originalMap; //оригиналната карта, заредена от подадения файл
+    Junction *currentJunction; //позицията, на която потребителят се намира в момента
+    std::vector<std::string> closedJunctions; //затворените кръстовища
 };

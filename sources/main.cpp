@@ -19,10 +19,6 @@ int main(int argc, char *argv[])
     std::ifstream fin{"test.txt"};
     Map map;
     fin >> map;
-    for (auto junct : map.getJunctions())
-    {
-        std::cout << junct->getName() <<" "<< junct->getStreets().size() << std::endl;
-    }
     auto deadEnds = map.getDeadends();
     for (auto deadend : deadEnds)
     {

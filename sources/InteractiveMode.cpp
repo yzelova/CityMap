@@ -1,8 +1,9 @@
 #include "../lib/InteractiveMode.hpp"
+#include "../lib/Street.hpp"
 #include <iostream>
 #include <cassert>
 
-//opens file, reads map from it and places the user at startJunctionName
+//отваря файл, прочита карта и намира началното кръстовище
 InteractiveMode::InteractiveMode(const std::string &filePath, const std::string &startJunctionName)
 {
     std::ifstream fin{filePath};
@@ -11,7 +12,7 @@ InteractiveMode::InteractiveMode(const std::string &filePath, const std::string 
     currentJunction = originalMap.getJunctionByName(startJunctionName);
 }
 
-//parses and executes commands from command line
+//Парсва и изпълнява команда
 bool InteractiveMode::readAndProcessCommand()
 {
     auto currentMap = getMap();
@@ -25,12 +26,13 @@ bool InteractiveMode::readAndProcessCommand()
     {
         std::string newJunctionName;
         std::cin >> newJunctionName;
-        auto newJunction = currentMap.getJunctionByName(newJunctionName);
+        auto newJunction = currentMap.getJunctionByName(newJunctionName); //проверяваме дали в картата със затворени кръстовища има такова кръстовище
         if (newJunction == nullptr)
         {
             std::cout << "Junction with that name does not exist or is closed!\n";
             return true;
         }
+        newJunction = originalMap.getJunctionByName(newJunctionName); //взимаме кръстовището от оригиналната карта
         currentJunction = newJunction;
     }
     else if (command.compare("neighbours") == 0)
@@ -59,7 +61,13 @@ bool InteractiveMode::readAndProcessCommand()
             std::cout << junctionName << " ";
         }
         std::cout << std::endl;
-        currentJunction = currentMap.getJunctionByName(moveToName);
+        auto newJunction = originalMap.getJunctionByName(moveToName);
+        if(newJunction == nullptr)
+        {
+            std::cout<<"THis junction does not exist\n";
+            return true;
+        }
+        currentJunction = newJunction;
     }
     else if (command.compare("close") == 0)
     {

@@ -1,6 +1,9 @@
 #include <vector>
 #include <algorithm>
 #include "Junction.hpp"
+#include "Street.hpp"
+
+//Помощни функции за проверки, които се извършват често - дали вектор съдържа улица или кръстовище
 
 bool vectorContainsStreet(const std::vector<Street> &v, const Street &street)
 {
