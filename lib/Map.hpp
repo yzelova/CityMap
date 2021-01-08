@@ -42,8 +42,8 @@ private:
     void copy(const Map &);
     std::optional<std::pair<std::vector<std::string>, int>> getShortestPath(Junction *, Junction *);
     bool hasEulerianCycle();
-    std::string readJunctionName(std::string &);
-    double readDistance(std::string &);
+    std::optional<std::string> readString(std::string &);
+    std::optional<double> readDistance(std::string &);
     int reachableJunctionsCount(Junction *,std::vector<Junction *> &);
     std::vector<Junction *> junctions;
     Junction *getJunctionByName(const std::string &);

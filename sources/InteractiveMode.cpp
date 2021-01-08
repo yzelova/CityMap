@@ -1,15 +1,25 @@
 #include "../lib/InteractiveMode.hpp"
 #include "../lib/Street.hpp"
 #include <iostream>
+#include <exception>
 #include <cassert>
 
 //отваря файл, прочита карта и намира началното кръстовище
 InteractiveMode::InteractiveMode(const std::string &filePath, const std::string &startJunctionName)
 {
     std::ifstream fin{filePath};
-    assert(fin.good());
+    if(!fin.good())
+    {
+        std::cout<<"That file does not exist or can not be opened!\n";
+        throw(std::runtime_error("can not open file"));
+    }
     fin >> originalMap;
     currentJunction = originalMap.getJunctionByName(startJunctionName);
+    if(!currentJunction)
+     {
+        std::cout<<"Start junction junction does not exist in the map!\n";
+        throw(std::runtime_error("does not exist"));
+    }
 }
 
 //Парсва и изпълнява команда
@@ -73,10 +83,15 @@ bool InteractiveMode::readAndProcessCommand()
     {
         std::string junctionName;
         std::cin >> junctionName;
-        auto found = originalMap.getJunctionByName(junctionName) != nullptr;
-        if (!found)
+        auto junction = originalMap.getJunctionByName(junctionName);
+        if (!junction)
         {
             std::cout << "No such junction exists!\n";
+            return true;
+        }
+        if(junction == currentJunction)
+        {
+            std::cout << "Can not close current junction!\n";
             return true;
         }
         closedJunctions.push_back(junctionName);
