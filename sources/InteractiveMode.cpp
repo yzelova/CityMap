@@ -17,7 +17,7 @@ InteractiveMode::InteractiveMode(const std::string &filePath, const std::string 
     currentJunction = originalMap.getJunctionByName(startJunctionName);
     if(!currentJunction)
      {
-        std::cout<<"Start junction junction does not exist in the map!\n";
+        std::cout<<"Start junction does not exist in the map!\n";
         throw(std::runtime_error("does not exist"));
     }
 }
@@ -74,7 +74,7 @@ bool InteractiveMode::readAndProcessCommand()
         auto newJunction = originalMap.getJunctionByName(moveToName);
         if(newJunction == nullptr)
         {
-            std::cout<<"THis junction does not exist\n";
+            std::cout<<"This junction does not exist\n";
             return true;
         }
         currentJunction = newJunction;
@@ -86,12 +86,12 @@ bool InteractiveMode::readAndProcessCommand()
         auto junction = originalMap.getJunctionByName(junctionName);
         if (!junction)
         {
-            std::cout << "No such junction exists!\n";
+            std::cout<<"This junction does not exist\n";
             return true;
         }
         if(junction == currentJunction)
         {
-            std::cout << "Can not close current junction!\n";
+            std::cout << "Cannot close current junction!\n";
             return true;
         }
         closedJunctions.push_back(junctionName);
@@ -103,7 +103,7 @@ bool InteractiveMode::readAndProcessCommand()
         auto found = originalMap.getJunctionByName(junctionName) != nullptr;
         if (!found)
         {
-            std::cout << "No such junction exists!\n";
+            std::cout<<"This junction does not exist\n";
             return true;
         }
         closedJunctions.erase(std::find_if(closedJunctions.begin(), closedJunctions.end(), [junctionName](auto vecJunction) {
@@ -143,6 +143,7 @@ bool InteractiveMode::readAndProcessCommand()
     return true;
 }
 
+/// Взима карта без затворените кръстовища
 Map InteractiveMode::getMap()
 {
     return originalMap.closeJunctions(closedJunctions);

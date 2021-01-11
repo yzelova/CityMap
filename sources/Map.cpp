@@ -95,7 +95,7 @@ std::ifstream &operator>>(std::ifstream &in, Map &map)
 }
 
 /// Помощен метод който чете име на кръстовище
-std::optional<std::string> Map::readString(std::string &line)
+std::optional<std::string> Map::readString(std::string &line) const
 {
     while (!line.empty() && line[0] == ' ')
     {
@@ -115,7 +115,7 @@ std::optional<std::string> Map::readString(std::string &line)
 }
 
 /// Помощен метод който чете разстояние
-std::optional<double> Map::readDistance(std::string &line)
+std::optional<double> Map::readDistance(std::string &line) const
 {
     try
     {
@@ -133,7 +133,7 @@ std::optional<double> Map::readDistance(std::string &line)
 }
 
 /// Проверява дали има път между две крастовища, използва BFS
-bool Map::hasPath(const std::string &startJunctionName, const std::string &endJunctionName)
+bool Map::hasPath(const std::string &startJunctionName, const std::string &endJunctionName) const
 {
     auto startJunction = getJunctionByName(startJunctionName);
     auto endJunction = getJunctionByName(endJunctionName);
@@ -159,7 +159,7 @@ bool Map::hasPath(const std::string &startJunctionName, const std::string &endJu
 }
 
 /// Проверява дали всички други кръстовища са достижими от подаденото
-bool Map::canReachEveryOtherJunction(const std::string &junctionName)
+bool Map::canReachEveryOtherJunction(const std::string &junctionName) const
 {
     auto currentJunction = getJunctionByName(junctionName);
     std::vector<Junction *> reachedJunctions{currentJunction};
@@ -168,7 +168,7 @@ bool Map::canReachEveryOtherJunction(const std::string &junctionName)
 }
 
 /// Брои достижимите кръстовища чрез DFS
-int Map::reachableJunctionsCount(Junction *currentJunction, std::vector<Junction *> &reachedJunctions)
+int Map::reachableJunctionsCount(Junction *currentJunction, std::vector<Junction *> &reachedJunctions) const
 {
     if (currentJunction->getStreets().size() == 0)
     {
@@ -189,7 +189,7 @@ int Map::reachableJunctionsCount(Junction *currentJunction, std::vector<Junction
 }
 
 /// Проверява дали ако тръгнем от едно кръстовище, можем да се върнем обратно в него - търси цикъл в графа, ползва BFS
-bool Map::hasCyclicWalkFromJunction(const std::string &junctionName)
+bool Map::hasCyclicWalkFromJunction(const std::string &junctionName) const
 {
     auto junction = getJunctionByName(junctionName);
     if (junction->getStreets().size() == 0)
@@ -229,7 +229,7 @@ bool Map::hasCyclicWalkFromJunction(const std::string &junctionName)
  *  а при възможно добавяне/махане на кръстовища (което се поддържа заради интерактивния режим)
  *  ще трябва да се актуализира още един списък - този с улиците. 
  * */
-std::vector<std::pair<std::string, std::string>> Map::getDeadends()
+std::vector<std::pair<std::string, std::string>> Map::getDeadends() const
 {
     std::vector<std::pair<std::string, std::string>> deadends;
     for (auto junction : junctions)
@@ -247,7 +247,7 @@ std::vector<std::pair<std::string, std::string>> Map::getDeadends()
 }
 
 /// Помощен метод който връща указател към кръстовище по неговото име. Ако не го намери - nullptr
-Junction *Map::getJunctionByName(const std::string &junctiontName)
+Junction *Map::getJunctionByName(const std::string &junctiontName) const
 {
     auto junction = std::find_if(junctions.begin(),
                                  junctions.end(),
@@ -258,7 +258,7 @@ Junction *Map::getJunctionByName(const std::string &junctiontName)
 }
 
 /// Намира туристическа обиколка на града, която минава по всички улици - търси цикъл на Ойлер
-std::optional<std::vector<std::string>> Map::getEulerWalk()
+std::optional<std::vector<std::string>> Map::getEulerWalk() const
 {
     bool hasCycle = hasEulerianCycle();
     if (!hasCycle)
@@ -307,7 +307,7 @@ std::optional<std::vector<std::string>> Map::getEulerWalk()
  * Брои улиците - неоптимално, вместо да държи броя на улиците, но се ползва само   
  * при търсенето на Ойлеров цикъл.
  * */
-int Map::getStreetsCount()
+int Map::getStreetsCount() const
 {
     int streetsCount{0};
     for (auto junction : junctions)
@@ -325,7 +325,7 @@ int Map::getStreetsCount()
  * им - най-вече на улиците, излизащи от тях. Тоест, ако трием от оригиналната карта,
  * ще загубим оригиналните кръстовища и техните улици.
  * */
-Map Map::closeJunctions(const std::vector<std::string> &closedJunctions)
+Map Map::closeJunctions(const std::vector<std::string> &closedJunctions) const
 {
     Map cpy{*this};
     for (auto name : closedJunctions)
@@ -349,7 +349,7 @@ Map Map::closeJunctions(const std::vector<std::string> &closedJunctions)
 }
 
 /// Взима 3те най-къси пътища между 2 точки, с подаден списък от затворени кръстовища
-std::vector<std::pair<std::vector<std::string>, int>> Map::get3ShortestPaths(const std::string &begin, const std::string &end, const std::vector<std::string> &closedJunctions)
+std::vector<std::pair<std::vector<std::string>, int>> Map::get3ShortestPaths(const std::string &begin, const std::string &end, const std::vector<std::string> &closedJunctions) const
 {
     auto cpy = closeJunctions(closedJunctions);
     return cpy.get3ShortestPaths(begin, end);
@@ -363,7 +363,7 @@ std::vector<std::pair<std::vector<std::string>, int>> Map::get3ShortestPaths(con
  * За третият най-къс път - Реброто, което е било премахнато за получаването на този път, се премахва и се прилага същата процедура
  * като за 2рият най-къс път.
  * */
-std::vector<std::pair<std::vector<std::string>, int>> Map::get3ShortestPaths(const std::string &begin, const std::string &end)
+std::vector<std::pair<std::vector<std::string>, int>> Map::get3ShortestPaths(const std::string &begin, const std::string &end) const
 {
     std::vector<std::pair<std::vector<std::string>, int>> result{};
     auto first = getShortestPath(getJunctionByName(begin), getJunctionByName(end));
@@ -411,7 +411,7 @@ std::vector<std::pair<std::vector<std::string>, int>> Map::get3ShortestPaths(con
  * Ако не намери път - връща optional без value
  * Ако намери - връща пътя и дължината му
  * */
-std::optional<std::pair<std::vector<std::string>, int>> Map::getShortestPath(Junction *begin, Junction *end)
+std::optional<std::pair<std::vector<std::string>, int>> Map::getShortestPath(Junction *begin, Junction *end) const
 {
     int junctionsCount = junctions.size();
     std::map<Junction *, int> distances;
@@ -471,7 +471,7 @@ std::optional<std::pair<std::vector<std::string>, int>> Map::getShortestPath(Jun
 }
 
 /// Проверява дали съществува Ойлеров цикъл
-bool Map::hasEulerianCycle()
+bool Map::hasEulerianCycle() const
 {
     for (auto junction : junctions)
     {

@@ -4,7 +4,7 @@
 #include "Map.hpp"
 #include "Junction.hpp"
 
-//Грижи се за интерактивният режим
+/// Грижи се за интерактивният режим
 class InteractiveMode
 {
 public:
